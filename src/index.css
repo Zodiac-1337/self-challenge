@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ─── Design tokens ─────────────────────────────────────────────────────────
+   @theme registers CSS vars AND generates Tailwind utility classes.
+   Colors: --color-* → bg-*, text-*, border-*
+   Fonts:  --font-*  → font-*
+   ───────────────────────────────────────────────────────────────────────── */
+@theme {
+  --color-surface:   #141414;
+  --color-surface-2: #1e1e1e;
+  --color-line:      #2a2a2a;
+  --color-accent:    #ff3d3d;
+  --color-ok:        #00c851;
+  --color-warn:      #ff9500;
+  --color-fg:        #f0f0f0;
+  --color-muted:     #666666;
+
+  /* --font-{name} → font-{name} utility class */
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'Inter', sans-serif;
+}
+
+/* ─── Legacy aliases ─────────────────────────────────────────────────────────
+   Components not yet migrated still use var(--surface), var(--accent) etc.
+   These map to the @theme values so nothing breaks.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  --bg:          #0a0a0a;
+  --surface:     var(--color-surface);
+  --surface-2:   var(--color-surface-2);
+  --border:      var(--color-line);
+  --text:        var(--color-fg);
+  --text-muted:  var(--color-muted);
+  --accent:      var(--color-accent);
+  --accent-ok:   var(--color-ok);
+  --accent-warn: var(--color-warn);
+}
+
+/* ─── Base ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--color-fg);
+  font-family: var(--font-body);
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── Component classes ─────────────────────────────────────────────────── */
+@layer components {
+
+  /* Input / Textarea */
+  .field {
+    @apply w-full bg-surface border border-line rounded-xl px-4 py-[14px]
+           font-body text-[15px] text-fg outline-none;
+  }
+  .field-danger  { border-color: #ff3d3d44; }
+  .field-success { border-color: #00c85144; }
+
+  /* Form step typography */
+  .step-title {
+    @apply font-display m-0 leading-none;
+    font-size: 1.8rem;
+    letter-spacing: 0.04em;
+  }
+  .step-sub   { @apply text-muted text-sm mt-1; }
+  .step-label { @apply text-sm font-semibold text-fg; }
+
+  /* Generic card shell */
+  .card { @apply bg-surface border border-line rounded-2xl; }
+
+  /* Full-width CTA button (pair with bg-* and text-* for colour) */
+  .btn-cta {
+    @apply w-full border-none rounded-2xl font-display cursor-pointer
+           transition-colors duration-200;
+    padding: 18px;
+    font-size: 1.3rem;
+    letter-spacing: 0.06em;
+  }
+  .btn-cta:disabled { @apply bg-surface-2 text-muted cursor-not-allowed; }
+
+  /* Ghost / text-only button */
+  .btn-ghost { @apply bg-transparent border-none text-muted text-sm cursor-pointer; }
+
+  /* Menu row (cancel/edit menu) */
+  .menu-row {
+    @apply w-full border border-line rounded-[14px] p-4
+           text-[15px] cursor-pointer text-left flex items-center gap-3;
+  }
+
+  /* Tiny label / badge above content */
+  .page-label { @apply text-muted text-[11px] tracking-[0.08em] uppercase; }
+}
+
+/* ─── Animations ────────────────────────────────────────────────────────── */
+@keyframes ripple {
+  from { transform: scale(0); opacity: 1; }
+  to   { transform: scale(1); opacity: 0; }
+}
+
+/* ─── Overrides ─────────────────────────────────────────────────────────── */
+input[type="datetime-local"] { color-scheme: dark; }
+
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
