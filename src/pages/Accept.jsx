@@ -16,12 +16,13 @@ export default function Accept() {
 
   const { form, cancelId } = state
 
-  const handleAccept = async () => {
+  const handleAccept = () => {
     if (navigator.vibrate) navigator.vibrate([50, 30, 200])
     if (cancelId) cancelChallenge(cancelId)
     const id = createChallenge(form)
-    // Подписка нефатальная — не блокируем навигацию
-    await subscribeChallenge({ id, title: form.title, deadline: form.deadline })
+    // Fire-and-forget: permission dialog появится поверх Active страницы,
+    // но навигация не блокируется — пользователь не ждёт
+    subscribeChallenge({ id, title: form.title, deadline: form.deadline })
     navigate('/active', { replace: true })
   }
 
@@ -60,7 +61,7 @@ export default function Accept() {
           onClick={handleAccept}
           style={{ boxShadow: '0 0 32px rgba(255,61,61,0.25)' }}
         >
-          {cancelId ? 'СОХРАНИТЬ' : 'ПРИНИМАЮ'}
+          {cancelId ? 'СОХРАНИТЬ. ПРОДОЛЖАЮ.' : 'ПРИНИМАЮ. НАЧИНАЕТСЯ.'}
         </Button>
 
         <Button variant="ghost" onClick={() => navigate(cancelId ? '/active' : '/create')}>

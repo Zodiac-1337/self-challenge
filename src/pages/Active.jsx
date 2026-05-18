@@ -75,8 +75,8 @@ export default function Active() {
     >
       {/* Header */}
       <div className="flex justify-between items-center">
-        <span style={{ color: 'var(--text-muted)', fontSize: '12px', letterSpacing: '0.08em' }}>АКТИВНЫЙ ВЫЗОВ</span>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <span className="page-label">АКТИВНЫЙ ВЫЗОВ</span>
+        <div className="flex gap-2 items-center">
           <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px', border: `1px solid ${color}`, color }}>
             {challenge.difficulty.toUpperCase()}
           </span>
