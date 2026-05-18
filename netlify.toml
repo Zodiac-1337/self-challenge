@@ -2,7 +2,10 @@
   command = "npm run build"
   publish = "dist"
 
-# SPA роутинг — без этого /active, /history возвращают 404 при прямом заходе
+[functions]
+  node_bundler = "esbuild"
+
+# SPA роутинг
 [[redirects]]
   from   = "/*"
   to     = "/index.html"

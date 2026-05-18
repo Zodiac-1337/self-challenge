@@ -4,6 +4,7 @@ import { useChallengeStore } from '../store/challengeStore'
 import { contractVariants } from '../hooks/usePageTransition'
 import ContractCard from '../components/accept/ContractCard'
 import Button from '../components/ui/Button'
+import { subscribeChallenge } from '../hooks/usePushNotification'
 
 export default function Accept() {
   const { state }       = useLocation()
@@ -15,10 +16,12 @@ export default function Accept() {
 
   const { form, cancelId } = state
 
-  const handleAccept = () => {
+  const handleAccept = async () => {
     if (navigator.vibrate) navigator.vibrate([50, 30, 200])
     if (cancelId) cancelChallenge(cancelId)
-    createChallenge(form)
+    const id = createChallenge(form)
+    // Подписка нефатальная — не блокируем навигацию
+    await subscribeChallenge({ id, title: form.title, deadline: form.deadline })
     navigate('/active', { replace: true })
   }
 
@@ -57,7 +60,7 @@ export default function Accept() {
           onClick={handleAccept}
           style={{ boxShadow: '0 0 32px rgba(255,61,61,0.25)' }}
         >
-          {cancelId ? 'СОХРАНИТЬ. ПРОДОЛЖАЮ.' : 'ПРИНИМАЮ. НАЧИНАЕТСЯ.'}
+          {cancelId ? 'СОХРАНИТЬ' : 'ПРИНИМАЮ'}
         </Button>
 
         <Button variant="ghost" onClick={() => navigate(cancelId ? '/active' : '/create')}>
