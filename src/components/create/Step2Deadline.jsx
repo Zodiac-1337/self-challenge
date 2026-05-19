@@ -1,11 +1,5 @@
 import { DIFFICULTIES } from '../../constants/challenges'
-import Input from '../ui/Input'
-
-function getMinDeadline() {
-  const d = new Date()
-  d.setMinutes(d.getMinutes() - d.getTimezoneOffset() + 5)
-  return d.toISOString().slice(0, 16)
-}
+import DateTimePicker from '../ui/DateTimePicker'
 
 export default function Step2Deadline({ form, set }) {
   return (
@@ -15,23 +9,10 @@ export default function Step2Deadline({ form, set }) {
         <p className="step-sub">После этого момента вызов считается проваленным автоматически</p>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <Input
-          type="datetime-local"
-          value={form.deadline}
-          min={getMinDeadline()}
-          onChange={e => set('deadline', e.target.value)}
-          style={{ colorScheme: 'dark' }}
-        />
-        {form.deadline && (
-          <span className="text-muted text-[11px] px-1">
-            {new Date(form.deadline).toLocaleString('ru-RU', {
-              weekday: 'long', day: 'numeric', month: 'long',
-              hour: '2-digit', minute: '2-digit',
-            })}
-          </span>
-        )}
-      </div>
+      <DateTimePicker
+        value={form.deadline}
+        onChange={val => set('deadline', val)}
+      />
 
       <div>
         <p className="step-sub mb-[10px]">Сложность:</p>
