@@ -1,8 +1,12 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useChallengeStore, computeLevel } from '../store/challengeStore'
 import { pageVariants } from '../hooks/usePageTransition'
-import Button from '../components/ui/Button'
+import Button      from '../components/ui/Button'
+import Onboarding  from '../components/onboarding/Onboarding'
+
+const ONBOARDING_KEY = 'sc_onboarded'
 
 export default function Home() {
   const navigate = useNavigate()
@@ -10,7 +14,22 @@ export default function Home() {
   const streak   = useChallengeStore(s => s.streak)
   const level    = useChallengeStore(s => computeLevel(s.streak))
 
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => !localStorage.getItem(ONBOARDING_KEY)
+  )
+
   if (active) { navigate('/active', { replace: true }); return null }
+
+  if (showOnboarding) {
+    return (
+      <Onboarding
+        onDone={() => {
+          localStorage.setItem(ONBOARDING_KEY, '1')
+          setShowOnboarding(false)
+        }}
+      />
+    )
+  }
 
   return (
     <motion.div
@@ -18,6 +37,7 @@ export default function Home() {
       initial="initial" animate="animate" exit="exit"
       className="flex flex-col items-center justify-center h-full px-6 gap-8"
     >
+      {/* Уровень */}
       <div className="flex flex-col items-center gap-2">
         <span className="text-[52px]">{level.emoji}</span>
         <span className="text-muted text-[12px] tracking-[0.12em]">
@@ -28,6 +48,7 @@ export default function Home() {
         )}
       </div>
 
+      {/* Заголовок */}
       <div className="flex flex-col items-center gap-4 w-full">
         <h1
           className="font-display text-center m-0"
@@ -40,6 +61,7 @@ export default function Home() {
         </p>
       </div>
 
+      {/* CTA */}
       <Button
         variant="primary"
         size="lg"

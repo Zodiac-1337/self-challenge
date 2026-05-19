@@ -10,6 +10,7 @@ import ConditionsList  from '../components/active/ConditionsList'
 import ConfirmComplete from '../components/active/ConfirmComplete'
 import ConfirmFail     from '../components/active/ConfirmFail'
 import ConfirmCancel   from '../components/active/ConfirmCancel'
+import ChallengeNotes  from '../components/active/ChallengeNotes'
 import Button          from '../components/ui/Button'
 
 const BG_TINT = {
@@ -90,6 +91,7 @@ export default function Active() {
 
       <ChallengeTimer time={time} color={color} />
       <ConditionsList challenge={challenge} />
+      <ChallengeNotes challengeId={challenge.id} notes={challenge.notes ?? []} />
       <div className="flex-1" />
 
       <AnimatePresence mode="wait">

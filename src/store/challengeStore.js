@@ -18,34 +18,36 @@ function computeLevel(streak) {
 const useChallengeStore = create(
   persist(
     (set, get) => ({
-      // ── State ──────────────────────────────────────────────
       challenges: [],
-      activeId: null,
-      streak: 0,
-      totalXP: 0,
+      activeId:   null,
+      streak:     0,
+      totalXP:    0,
 
-      // ── Actions ────────────────────────────────────────────
       createChallenge(data) {
         const id = uuidv4()
         const challenge = {
           id,
           title:            data.title,
           description:      data.description ?? '',
-          deadline:         data.deadline,           // ISO string
+          deadline:         data.deadline,
           failureCondition: data.failureCondition ?? 'Не выполнил задачу',
           reward:           data.reward ?? 'Гордость за себя',
           stake:            data.stake ?? '',
           difficulty:       data.difficulty ?? 'medium',
+          notes:            [],
           status:           'active',
           createdAt:        new Date().toISOString(),
           completedAt:      null,
           failureNote:      null,
           xpEarned:         0,
+          // ── Прогресс-трекер ────────────────────────────────
+          target: data.targetEnabled && data.targetValue
+            ? { value: Number(data.targetValue), unit: data.targetUnit ?? '', current: 0 }
+            : null,
+          // ── Заметки ────────────────────────────────────────
+          notes: [],
         }
-        set(state => ({
-          challenges: [...state.challenges, challenge],
-          activeId: id,
-        }))
+        set(state => ({ challenges: [...state.challenges, challenge], activeId: id }))
         return id
       },
 
@@ -59,19 +61,15 @@ const useChallengeStore = create(
         const usedMs      = new Date(completedAt)  - new Date(ch.createdAt)
         const savedHours  = Math.max(0, Math.floor((deadlineMs - usedMs) / 3_600_000))
         const baseXP      = XP_TABLE[ch.difficulty] ?? 25
-        const bonusXP     = savedHours * 5
-        const xpEarned    = baseXP + bonusXP
+        const xpEarned    = baseXP + savedHours * 5
 
         const prevLevel = computeLevel(streak)
         const newStreak = streak + 1
         const newLevel  = computeLevel(newStreak)
-        const leveledUp = newLevel.id !== prevLevel.id
 
         set(state => ({
           challenges: state.challenges.map(c =>
-            c.id === id
-              ? { ...c, status: 'completed', completedAt, xpEarned, savedHours }
-              : c
+            c.id === id ? { ...c, status: 'completed', completedAt, xpEarned, savedHours } : c
           ),
           activeId: null,
           streak:   newStreak,
@@ -80,17 +78,11 @@ const useChallengeStore = create(
 
         return {
           xpEarned, savedHours, newStreak,
-          level: newLevel, prevLevel, leveledUp,
+          level: newLevel, prevLevel,
+          leveledUp:           newLevel.id !== prevLevel.id,
           challengeTitle:      ch.title,
           challengeDifficulty: ch.difficulty,
         }
-      },
-
-      cancelChallenge(id) {
-        set(state => ({
-          challenges: state.challenges.filter(c => c.id !== id),
-          activeId: null,
-        }))
       },
 
       failChallenge(id, failureNote = '') {
@@ -105,23 +97,73 @@ const useChallengeStore = create(
         }))
       },
 
-      // Delete a historical challenge (active cannot be deleted this way)
-      deleteChallenge(id) {
+      addNote(challengeId, text) {
+        const note = { id: uuidv4(), text, createdAt: new Date().toISOString() }
         set(state => ({
-          challenges: state.challenges.filter(c => c.id !== id),
+          challenges: state.challenges.map(c =>
+            c.id === challengeId ? { ...c, notes: [...(c.notes ?? []), note] } : c
+          ),
         }))
       },
 
-      // Export full state as JSON string
+      deleteNote(challengeId, noteId) {
+        set(state => ({
+          challenges: state.challenges.map(c =>
+            c.id === challengeId
+              ? { ...c, notes: (c.notes ?? []).filter(n => n.id !== noteId) }
+              : c
+          ),
+        }))
+      },
+
+      cancelChallenge(id) {
+        set(state => ({
+          challenges: state.challenges.filter(c => c.id !== id),
+          activeId: null,
+        }))
+      },
+
+      deleteChallenge(id) {
+        set(state => ({ challenges: state.challenges.filter(c => c.id !== id) }))
+      },
+
+      // ── Прогресс-трекер ──────────────────────────────────────
+      updateProgress(id, current) {
+        set(state => ({
+          challenges: state.challenges.map(c => {
+            if (c.id !== id || !c.target) return c
+            const clamped = Math.max(0, Math.min(current, c.target.value))
+            return { ...c, target: { ...c.target, current: clamped } }
+          }),
+        }))
+      },
+
+      // ── Заметки ──────────────────────────────────────────────
+      addNote(id, text) {
+        const note = { id: uuidv4(), text: text.trim(), createdAt: new Date().toISOString() }
+        set(state => ({
+          challenges: state.challenges.map(c =>
+            c.id === id ? { ...c, notes: [...(c.notes ?? []), note] } : c
+          ),
+        }))
+      },
+
+      deleteNote(challengeId, noteId) {
+        set(state => ({
+          challenges: state.challenges.map(c =>
+            c.id === challengeId
+              ? { ...c, notes: (c.notes ?? []).filter(n => n.id !== noteId) }
+              : c
+          ),
+        }))
+      },
+
       exportData() {
         const { challenges, streak, totalXP } = get()
         return JSON.stringify({ challenges, streak, totalXP }, null, 2)
       },
     }),
-    {
-      name: 'self-challenge-store',
-      version: 1,
-    }
+    { name: 'self-challenge-store', version: 2 }
   )
 )
 
