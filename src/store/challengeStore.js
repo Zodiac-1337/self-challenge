@@ -145,7 +145,18 @@ const useChallengeStore = create(
         return JSON.stringify({ challenges, streak, bestStreak, totalXP }, null, 2)
       },
     }),
-    { name: 'self-challenge-store', version: 2 }
+    {
+      name:    'self-challenge-store',
+      version: 2,
+      // При обновлении версии — сохраняем данные, добавляем новые поля
+      migrate: (old, ver) => {
+        if (ver <= 1) {
+          // v1→v2: добавляем bestStreak (раньше не было)
+          return { ...old, bestStreak: old.streak ?? 0 }
+        }
+        return old
+      },
+    }
   )
 )
 

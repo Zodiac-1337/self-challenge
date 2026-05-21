@@ -17,7 +17,8 @@ function toLocalISO(date, hour, minute) {
 function getDefaultTime() {
   const d = new Date(Date.now() + 10 * 60 * 1000)
   const m = Math.ceil(d.getMinutes() / 5) * 5
-  if (m >= 60) return { hour: d.getHours() + 1, minute: 0 }
+  // % 24 handles the 23:5x edge case (prevents hour:24)
+  if (m >= 60) return { hour: (d.getHours() + 1) % 24, minute: 0 }
   return { hour: d.getHours(), minute: m }
 }
 

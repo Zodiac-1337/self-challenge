@@ -47,7 +47,7 @@ export default function ChallengeNotes({ challengeId, notes = [] }) {
             transition={{ duration: 0.2 }}
             style={{ overflow: 'hidden' }}
           >
-            <div className="flex flex-col gap-2 pt-1">
+            <div className="flex flex-col gap-2 pt-1 max-h-[200px] overflow-y-auto">
               {/* Notes list */}
               {sorted.map(note => (
                 <div
