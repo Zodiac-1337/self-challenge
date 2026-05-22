@@ -6,7 +6,9 @@ import { useChallengeStore, computeLevel } from '../store/challengeStore'
 import { pageVariants } from '../hooks/usePageTransition'
 import StatTile   from '../components/ui/StatTile'
 import Button     from '../components/ui/Button'
-import StatsView  from '../components/history/StatsView'
+import StatsView    from '../components/history/StatsView'
+import AuthButton   from '../components/auth/AuthButton'
+import { useAuth }  from '../hooks/useAuth'
 
 const STATUS_META = {
   completed: { label: 'Победа',  emoji: '🏆', color: '#00c851' },
@@ -47,6 +49,8 @@ export default function History() {
     )
   )
 
+  const auth = useAuth()
+
   const [tab, setTab] = useState('list')
 
   const wins   = history.filter(c => c.status === 'completed').length
@@ -70,7 +74,8 @@ export default function History() {
       <div className="px-5 pt-6 pb-4 flex flex-col gap-3" style={{ borderBottom: '1px solid var(--color-line)' }}>
         <div className="flex items-center gap-3">
           <Button variant="ghost" onClick={() => navigate('/')} className="text-[22px] p-0">←</Button>
-          <h2 className="m-0 font-display text-[1.6rem] tracking-[0.04em]">ИСТОРИЯ</h2>
+          <h2 className="m-0 font-display text-[1.6rem] tracking-[0.04em] flex-1">ИСТОРИЯ</h2>
+          <AuthButton {...auth} />
         </div>
         {/* Tabs */}
         <div className="flex gap-2">
