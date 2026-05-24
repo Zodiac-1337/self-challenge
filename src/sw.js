@@ -1,12 +1,12 @@
-import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
+import { cleanupOutdatedCaches, precacheAndRoute } from "workbox-precaching";
 
 // Workbox precaching — инжектируется vite-plugin-pwa
 precacheAndRoute(self.__WB_MANIFEST)
 cleanupOutdatedCaches()
 
 // ── Push notification handler ──────────────────────────────────────────────
-self.addEventListener('push', (event) => {
-  if (!event.data) return
+self.addEventListener("push", (event) => {
+  if (!event.data) return;
 
   const data = event.data.json()
 
